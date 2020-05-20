@@ -1,0 +1,148 @@
+spawn bash -c scp trace_capture.sh root@135.248.217.17:/tmp/
+
+
+Unauthorized use of this system is prohibited and may be prosecuted
+to the fullest extent of the law. By using this system, you implicitly
+agree to monitoring by system management and law enforcement authorities.
+If you do not agree with these terms, DISCONNECT NOW.root@135.248.217.17's password: 
+trace_capture.sh                                                                                 0%    0     0.0KB/s   --:-- ETAtrace_capture.sh                                                                               100% 2434     7.3KB/s   00:00    
+spawn bash -c scp trace_stop.sh root@135.248.217.17:/tmp/
+
+
+Unauthorized use of this system is prohibited and may be prosecuted
+to the fullest extent of the law. By using this system, you implicitly
+agree to monitoring by system management and law enforcement authorities.
+If you do not agree with these terms, DISCONNECT NOW.root@135.248.217.17's password: 
+trace_stop.sh                                                                                    0%    0     0.0KB/s   --:-- ETAtrace_stop.sh                                                                                  100% 3465    11.0KB/s   00:00    
+spawn ssh root@135.248.217.17
+
+
+Unauthorized use of this system is prohibited and may be prosecuted
+to the fullest extent of the law. By using this system, you implicitly
+agree to monitoring by system management and law enforcement authorities.
+If you do not agree with these terms, DISCONNECT NOW.root@135.248.217.17's password: 
+X11 forwarding request failed on channel 0
+Last login: Tue Feb 25 14:30:13 2020 from LCP_CLI
+
+
+WARNING!  This computer system and network is PRIVATE and PROPRIETARY
+and may only be accessed by authorized users.  Unauthorized use of this
+computer system or network is strictly prohibited and may be subject to
+criminal prosecution, employee discipline up to and including discharge,
+or the termination of vendor/service contracts.  The owner, or its agents,
+may monitor any activity or communication on the computer system or network.
+The owner, or its agents, may retrieve any information stored within the
+computer system or network.  By accessing and using this computer system
+or network, you are consenting to such monitoring and information retrieval
+for law enforcement and other purposes.  Users should have no expectation
+of privacy as to any communication on or information stored within the
+computer system or network, including information stored locally or remotely
+on a hard drive or other media in use with this computer system or network.
+Enter return to acknowledge message of the day: 
+Command line editor? (default = vi): 
+
+TERM: xterm  +  EDITOR: vi  +  DISPLAY: 
+
+########################################################################
+
+                        R36.28.06.0200
+
+########################################################################
+
+<LAB21721-oam-a:root>/root:
+# su - lss
+Last login: Tue Feb 25 14:30:23 IST 2020 on pts/0
+Enter return to acknowledge message of the day: 
+Command line editor? (default = vi): 
+
+TERM: xterm  +  EDITOR: vi  +  DISPLAY: 
+
+------------------------------------------------------
+ 1) startFS          ---  Start all FS processes
+ 2) stopFS           ---  Stop all FS processes
+ 3) startCNFG        ---  Start CONFIGURATION host processes
+ 4) stopCNFG         ---  Stop CONFIGURATION host processes
+------------------------------------------------------
+------------------------------------------------------
+1) startMI  ---  Start WebNMS
+2) stopMI   ---  Stop WebNMS
+------------------------------------------------------
+###########################spawn ssh root@135.248.217.17
+
+
+Unauthorized use of this system is prohibited and may be prosecuted
+to the fullest extent of the law. By using this system, you implicitly
+agree to monitoring by system management and law enforcement authorities.
+If you do not agree with these terms, DISCONNECT NOW.root@135.248.217.17's password: 
+X11 forwarding request failed on channel 0
+Last login: Tue Feb 25 14:30:20 2020 from LCP_CLI
+
+
+WARNING!  This computer system and network is PRIVATE and PROPRIETARY
+and may only be accessed by authorized users.  Unauthorized use of this
+computer system or network is strictly prohibited and may be subject to
+criminal prosecution, employee discipline up to and including discharge,
+or the termination of vendor/service contracts.  The owner, or its agents,
+may monitor any activity or communication on the computer system or network.
+The owner, or its agents, may retrieve any information stored within the
+computer system or network.  By accessing and using this computer system
+or network, you are consenting to such monitoring and information retrieval
+for law enforcement and other purposes.  Users should have no expectation
+of privacy as to any communication on or information stored within the
+computer system or network, including information stored locally or remotely
+on a hard drive or other media in use with this computer system or network.
+Enter return to acknowledge message of the day: 
+Command line editor? (default = vi): 
+
+TERM: xterm  +  EDITOR: vi  +  DISPLAY: 
+
+########################################################################
+
+                        R36.28.06.0200
+
+########################################################################
+
+<LAB21721-oam-a:root>/root:
+# 
+<LAB21721-oam-a:root>/tmp:
+# >progress.txt
+<LAB21721-oam-a:root>/tmp:
+# chmod 755 trace _capture.sh
+<LAB21721-oam-a:root>/tmp:
+# 
+Pseudo-terminal will not be allocated because stdin is not a terminal.
+
+
+WARNING!  This computer system and network is PRIVATE and PROPRIETARY
+and may only be accessed by authorized users.  Unauthorized use of this
+computer system or network is strictly prohibited and may be subject to
+criminal prosecution, employee discipline up to and including discharge,
+or the termination of vendor/service contracts.  The owner, or its agents,
+may monitor any activity or communication on the computer system or network.
+The owner, or its agents, may retrieve any information stored within the
+computer system or network.  By accessing and using this computer system
+or network, you are consenting to such monitoring and information retrieval
+for law enforcement and other purposes.  Users should have no expectation
+of privacy as to any communication on or information stored within the
+computer system or network, including information stored locally or remotely
+on a hard drive or other media in use with this computer system or network.
+stdin: is not a tty
+stty: standard input: Inappropriate ioctl for device
+stty: standard input: Inappropriate ioctl for device
+Enter return to acknowledge message of the day: TERM type? (default = vt220): Command line editor? (default = vi): 
+TERM: echo  +  EDITOR: echo  +  DISPLAY: 
+
+########################################################################
+
+                        R36.28.06.0200
+
+########################################################################
+
+
+
+
+
+
+<LAB21721-oam-a:root>/tmp:
+# exit
+Connection to 135.248.217.17 closed.
