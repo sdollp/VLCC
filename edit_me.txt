@@ -1,12 +1,14 @@
 -----------------------------------------------------------------------
 			  Enter T to Enable Trace & F to Disable Trace
 -----------------------------------------------------------------------
-SBC=F
-CFX=F
+SBC=T
+CFX=T
 TAS=T
-MRF=F
+MRF=T
 ENUM=F
 UTPROXY=F
+TIMER=900
+MERGECAP=T
 PATH=/drives/c/VLCC/
 
 
@@ -24,32 +26,34 @@ SBC_CFED_PCAP=T
 SBC_DFED_PCAP=T
 SBC_BGC_PCAP=T
 SBC_FW_PCAP=T
-SBC_SC_PCAP=F
-SBC_MASTER_LOG=F
+SBC_SC_PCAP=T
+SBC_MASTER_LOG=T
+
 ------------------------------------------------------------------------
 							CFX
 ------------------------------------------------------------------------	
 CFX_IP=10.200.158.69
 CFX_USER=root
 CFX_PASSWORD=yt_xk39b
-Multi_IP=F
+Multi_IP=T
 ************************************
     Logs to be Captured for CFX
 ************************************
-CFX_CIF_PCAP=T
+CFX_CIF_PCAP=F
 CFX_TDCORE_PCAP=F
-CFX_L2TD_PCAP=T
+CFX_L2TD_PCAP=F
 
 ------------------------------------------------------------------------
 							TAS
 ------------------------------------------------------------------------	
 TAS_IP=10.200.158.199
-TAS_USER=pradeep
-TAS_PASSWORD=Nokia@13
+TAS_USER=kumar
+TAS_PASSWORD=Aarnavi1$
 TAS_COMMAND=volte
 GETSUBSDATA_TAS=T
 TAS_IMPU 6590248664
 TAS_IMPU 6590248743
+
 ------------------------------------------------------------------------
 							MRF
 ------------------------------------------------------------------------	

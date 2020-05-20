@@ -1,6 +1,7 @@
 #!/bin/bash
 
 
+#version 2.0
 start_trace_sbc()
 {
 
@@ -27,9 +28,11 @@ start_trace_sbc()
 	bgc_status=$7
 	fw_status=$8
 	sc_status=$9
+	timer=${11}
+	tc_name=${12}
 	cd script
 	./copy_oam_script.sh $oam_ip $user $pwd
-	./start_trace_sbc.sh $oam_ip $user $pwd $cfed_status $dfed_status $bgc_status $fw_status $sc_status $path
+	./start_trace_sbc.sh $oam_ip $user $pwd $cfed_status $dfed_status $bgc_status $fw_status $sc_status $path $timer $tc_name
 	cd ..
 	echo 'T' >> status.txt
     
@@ -61,6 +64,7 @@ stop_trace_sbc()
 	fw_status=$8
 	master_status=$9
 	sc_status=${10}
+	tc_name=${12}
 	cd $folder
 	mkdir SBC
 	cd SBC
@@ -87,9 +91,9 @@ stop_trace_sbc()
 	cd ..
 
 	cd script
-	./stop_trace_sbc.sh $oam_ip $user $pwd $cfed_status $dfed_status $bgc_status $fw_status $master_status $sc_status
+	./stop_trace_sbc.sh $oam_ip $user $pwd $cfed_status $dfed_status $bgc_status $fw_status $master_status $sc_status $tc_name
 	sleep 5s 
-	./ship_pcap_files.sh $oam_ip $user $pwd $path $folder $cfed_status $dfed_status $bgc_status $fw_status $master_status $sc_status
+	./ship_pcap_files.sh $oam_ip $user $pwd $path $folder $cfed_status $dfed_status $bgc_status $fw_status $master_status $sc_status $tc_name
 	cd ..
 	
 }
@@ -111,9 +115,11 @@ start_trace_mrf()
     mrf_ip=$2
 	user=$3
 	pwd=$4
+	timer=$5
+	tc_name=${6}
 	cd script
 	
-	./start_trace_mrf.sh $mrf_ip $user $pwd 
+	./start_trace_mrf.sh $mrf_ip $user $pwd $timer $tc_name
 
 	cd ..
 	echo 'T' >> status.txt
@@ -141,12 +147,13 @@ stop_trace_mrf()
 	 mrf_ip=$2
 	 user=$3
 	 pwd=$4
+	 tc_name=${5}
 	 cd $folder
 	 mkdir MRF 
 	 cd ..
 	 cd script
-         ./stop_trace_mrf.sh $mrf_ip $user $pwd $path $folder
-         ./ship_pcap_files_mrf.sh $mrf_ip $user $pwd $path $folder
+         ./stop_trace_mrf.sh $mrf_ip $user $pwd $path $folder $tc_name
+         ./ship_pcap_files_mrf.sh $mrf_ip $user $pwd $path $folder $tc_name
          cd ..
 
 
@@ -175,6 +182,8 @@ start_trace_cfx()
 	cif_status=$5
 	tdcore_status=$6
 	multi_ip=$7
+	timer=$8
+	tc_name=${9}
 
 	cd script
 	./copy_cfx_script.sh $cif_ip $user $pwd
@@ -184,14 +193,14 @@ start_trace_cfx()
 	
 	if [[ "$multi_ip" == "F" ]]; then	
 		cif_act=$(cat cif)
-		./start_trace_cfx_acif.sh $cif_ip $user $pwd $cif_act
+		./start_trace_cfx_acif.sh $cif_ip $user $pwd $cif_act $timer $tc_name
 		ltd=$(cat ltd)
-		./start_trace_cfx_l2td.sh $cif_ip $user $pwd $ltd
+		./start_trace_cfx_l2td.sh $cif_ip $user $pwd $ltd $timer $tc_name
 	fi
 	
 	if [[ "$multi_ip" == "T" ]]; then
 		cif_act=$(cat cif)
-		./start_trace_cfx_acif.sh $cif_ip $user $pwd $cif_act
+		./start_trace_cfx_acif.sh $cif_ip $user $pwd $cif_act $timer $tc_name
 		cat tdcore | while read line 
 		do
 	   
@@ -199,7 +208,7 @@ start_trace_cfx()
 		echo
 		echo
 		echo
-			./start_trace_cfx_tdcore.sh $cif_ip $user $pwd $line
+			./start_trace_cfx_tdcore.sh $cif_ip $user $pwd $line $timer $tc_name
 		
 		done
 		
@@ -255,6 +264,7 @@ stop_trace_cfx()
 	cif_status=$5
 	tdcore_status=$6
 	multi_ip=$7
+	tc_name=$8
 	cd $folder
 	mkdir CFX
 	#cd CFX
@@ -269,9 +279,22 @@ stop_trace_cfx()
 		cd ..
 		cd script
 		cif_act=$(cat cif)
-		./stop_trace_cfx_acif.sh $cif_ip $user $pwd $cif_act
+		./get_process_id.sh  $cif_ip $user $pwd $cif_act
+		echo
+		echo
+
+		chmod 755 process_id
+		echo
+		echo "permission "
+		echo "$tc_name"
+		proc_id=$(grep $tc_name process_id | awk '{print $2}')
+		echo "$proc_id"
+		./stop_trace_cfx_acif.sh $cif_ip $user $pwd $cif_act $proc_id $tc_name
 		ltd=$(cat ltd)
-		./stop_trace_cfx_l2td.sh $cif_ip $user $pwd $ltd
+		./get_process_id.sh  $cif_ip $user $pwd $ltd_act
+		chmod 755 process_id
+		proc_id=$(grep $tc_name process_id | awk '{print $2}')
+		./stop_trace_cfx_l2td.sh $cif_ip $user $pwd $ltd $proc_id $tc_name
 		cd ..
 		cd $folder
 		
@@ -285,12 +308,17 @@ stop_trace_cfx()
 		cd ..
 		cd script
 		cif_act=$(cat cif)
-		./stop_trace_cfx_acif.sh $cif_ip $user $pwd $cif_act
+		./get_process_id.sh  $cif_ip $user $pwd $cif_act
+		chmod 755 process_id
+		proc_id=$(grep $tc_name process_id | awk '{print $2}')
+		./stop_trace_cfx_acif.sh $cif_ip $user $pwd $cif_act $proc_id $tc_name
 		cat tdcore | while read line
 		do 
 		echo
-
-		./stop_trace_cfx_tdcore.sh $cif_ip $user $pwd $line
+		./get_process_id.sh  $cif_ip $user $pwd $line
+		chmod 755 process_id
+		proc_id=$(grep $tc_name process_id | awk '{print $2}')
+		./stop_trace_cfx_tdcore.sh $cif_ip $user $pwd $line $proc_id $tc_name
 		echo
 		echo
 		done
@@ -365,7 +393,6 @@ start_trace_tas()
 	command="$5"
 	precall_subs_data=$6
 	grep 'TAS_IMPU' edit_me.txt | cut -d " " -f 2 > script/tas_impu
-	
 	cd script
 	touch TAS_PRE_CALL_SUBSDATA.txt
 	chmod 755 tas_impu TAS_PRE_CALL_SUBSDATA.txt
@@ -386,11 +413,6 @@ start_trace_tas()
 		done
 
 	fi
-
-	# GET PRE_CALL SUBS DATA FILE TO LOCAL SYSTEM
-
-	#./ship_precall_subdata_tas.sh $tas_ip $user $pwd $path $folder
-
 	./start_trace_tas.sh $tas_ip $user $pwd $command
 
 	cd ..
@@ -423,15 +445,14 @@ stop_trace_tas()
 	 cd $folder
 	 mkdir TAS
 	 cd ..
-
 	 cd script
-	
-          touch TAS_POST_CALL_SUBSDATA.txt
+	 	touch TAS_POST_CALL_SUBSDATA.txt
 
          ./stop_trace_tas.sh $tas_ip $user $pwd $command
          ./ship_pcap_files_tas.sh $tas_ip $user $pwd $path $folder
 
-        chmod 755 tas_impu TAS_POST_CALL_SUBSDATA.txt
+
+    	chmod 755 tas_impu TAS_POST_CALL_SUBSDATA.txt
         True="T"
 		if [ "$postcall_subs_data" = "T" ]
         then
@@ -454,6 +475,7 @@ stop_trace_tas()
          mkdir $folder/TAS/SUBS_DATA
          mv script/TAS_PRE_CALL_SUBSDATA.txt $folder/TAS/SUBS_DATA
          mv script/TAS_POST_CALL_SUBSDATA.txt $folder/TAS/SUBS_DATA
+
 }
 
 
@@ -461,11 +483,14 @@ Main()
 {
 	start=`date +%s`
 	dos2unix edit_me.txt
+	tc_name=$2
 	SBC=$(grep -m 1 -w 'SBC' edit_me.txt | cut -d "=" -f 2)
 	CFX=$(grep -m 1 -w 'CFX' edit_me.txt | cut -d "=" -f 2)
 	TAS=$(grep -m 1 -w 'TAS' edit_me.txt | cut -d "=" -f 2)
 	MRF=$(grep -m 1 -w 'MRF' edit_me.txt | cut -d "=" -f 2)
 	DIR=$(grep -m 1 -w 'PATH' edit_me.txt | cut -d "=" -f 2)
+	TIMER=$(grep -m 1 -w 'TIMER' edit_me.txt | cut -d "=" -f 2)
+	MERGECAP=$(grep -m 1 -w 'MERGECAP' edit_me.txt | cut -d "=" -f 2)
 	
 	sleep 2s
 	True="T"
@@ -490,7 +515,7 @@ Main()
 	echo "################################################################################"
 	echo
 	echo
-	echo " 			TRACE CAPTURE TOOL				"
+	echo " 			TRACE CAPTURE TOOL v2.0				"
 	echo
 	echo
 	echo "################################################################################"
@@ -526,7 +551,7 @@ Main()
 			grep -i 'SBC_.*=T' edit_me.txt
 			echo "*********************************"
 			echo
-			start_trace_sbc $folder $SBC_IP $SBC_USER $SBC_PASSWORD $CFED $DFED $BGC $FW $SC $DIR > sbc.log &
+			start_trace_sbc $folder $SBC_IP $SBC_USER $SBC_PASSWORD $CFED $DFED $BGC $FW $SC $DIR $TIMER $tc_name > sbc.log &
 			
 			#echo "SBC Trace is enabled"
 		else 
@@ -548,7 +573,7 @@ Main()
 			grep -i 'TAS_.*=T' edit_me.txt
 			echo "*********************************"
 			echo
-			start_trace_tas $folder $TAS_IP $TAS_USER $TAS_PASSWORD $TAS_COMMAND $TAS_SUBS_DATA > tas.log &
+			start_trace_tas $folder $TAS_IP $TAS_USER $TAS_PASSWORD $TAS_COMMAND $TAS_SUBS_DATA  > tas.log &
 			#echo "TAS Trace is Enabled "
 		else 
 			echo -e "TAS Trace is \e[1;31m Not applicable\e[0m"
@@ -565,7 +590,7 @@ Main()
 			grep -i 'MRF_.*=T' edit_me.txt
 			echo "*********************************"
 			echo
-			start_trace_mrf $folder $MRF_IP $MRF_USER $MRF_PASSWORD > mrf.log &
+			start_trace_mrf $folder $MRF_IP $MRF_USER $MRF_PASSWORD $TIMER $tc_name > mrf.log &
 			#echo "MRF Trace is Enabled "
 		else 
 			echo -e "MRF Trace is \e[1;31m Not applicable\e[0m"
@@ -585,7 +610,7 @@ Main()
 			grep -i 'CFX_.*=T' edit_me.txt
 			echo "*********************************"
 			echo
-			start_trace_cfx $folder $CFX_IP $CFX_USER $CFX_PASSWORD $CIF $TDCORE $MULTI_IP > cfx.log &
+			start_trace_cfx $folder $CFX_IP $CFX_USER $CFX_PASSWORD $CIF $TDCORE $MULTI_IP $TIMER $tc_name > cfx.log &
 			#echo "CFX Trace is Enabled "
 		else 
 			echo -e "CFX Trace is \e[1;31m Not applicable\e[0m"
@@ -600,7 +625,7 @@ Main()
 		end=`date +%s`
 		#echo "All Trace Capture Started",$((end-start))
 		echo 
-			
+		echo "$count"			
 		while true
 		do
 			line_count=$(wc -l < status.txt)
@@ -626,7 +651,7 @@ Main()
 			FW=$(grep -m 1 -w 'SBC_FW_PCAP' edit_me.txt | cut -d "=" -f 2)
 			MASTER=$(grep -m 1 -w 'SBC_MASTER_LOG' edit_me.txt | cut -d "=" -f 2)
 			SC=$(grep -m 1 -w 'SBC_SC_PCAP' edit_me.txt | cut -d "=" -f 2)
-			stop_trace_sbc $folder $SBC_IP $SBC_USER $SBC_PASSWORD $CFED $DFED $BGC $FW $MASTER $SC $DIR
+			stop_trace_sbc $folder $SBC_IP $SBC_USER $SBC_PASSWORD $CFED $DFED $BGC $FW $MASTER $SC $DIR $tc_name
 		else 
 			echo -e "SBC Trace is \e[1;31m Not applicable\e[0m"
 		fi
@@ -640,7 +665,6 @@ Main()
 			TAS_PASSWORD=$(grep -m2 -w 'TAS_PASSWORD' edit_me.txt | cut -d "=" -f 2)
 			TAS_COMMAND=$(grep -m2 -w 'TAS_COMMAND' edit_me.txt | cut -d "=" -f 2)
 			TAS_SUBS_DATA=$(grep -m2 -w 'GETSUBSDATA_TAS' edit_me.txt | cut -d "=" -f 2)
-			TAS_SUBS_DATA=$(grep -m2 -w 'GETSUBSDATA_TAS' edit_me.txt | cut -d "=" -f 2)
 			stop_trace_tas $folder $TAS_IP $TAS_USER $TAS_PASSWORD $TAS_COMMAND $TAS_SUBS_DATA
 		else 
 			echo -e "TAS Trace is \e[1;31m Not applicable\e[0m"
@@ -650,7 +674,7 @@ Main()
 			MRF_IP=$(grep -m2 -w 'MRF_IP' edit_me.txt | cut -d "=" -f 2)
 			MRF_USER=$(grep -m2 -w 'MRF_USER' edit_me.txt | cut -d "=" -f 2)
 			MRF_PASSWORD=$(grep -m2 -w 'MRF_PASSWORD' edit_me.txt | cut -d "=" -f 2)
-			stop_trace_mrf $folder $MRF_IP $MRF_USER $MRF_PASSWORD 
+			stop_trace_mrf $folder $MRF_IP $MRF_USER $MRF_PASSWORD $tc_name
 		else 
 			echo -e "MRF Trace is \e[1;31m Not applicable\e[0m"
 		fi 
@@ -662,42 +686,43 @@ Main()
 			CIF=$(grep -m 1 -w 'CFX_CIF_PCAP' edit_me.txt | cut -d "=" -f 2)
 			TDCORE=$(grep -m 1 -w 'CFX_TDCORE_PCAP' edit_me.txt | cut -d "=" -f 2)
 			MULTI_IP=$(grep -m 1 -w 'Multi_IP' edit_me.txt | cut -d "=" -f 2)
-			stop_trace_cfx $folder $CFX_IP $CFX_USER $CFX_PASSWORD $CIF $TDCORE $MULTI_IP
+			stop_trace_cfx $folder $CFX_IP $CFX_USER $CFX_PASSWORD $CIF $TDCORE $MULTI_IP $tc_name
 		else 
 			echo -e "CFX Trace is \e[1;31m Not applicable\e[0m"
 			
 		fi
 		
 		
-
-		cd $folder
-		mkdir PCAP
-		if [[ "$TAS" == "$True" ]]; then
+		if [[ "$MERGECAP" == "T" ]]; then
+			cd $folder
+			mkdir PCAP
+			if [[ "$TAS" == "$True" ]]; then
+				cd ..
+				cd /drives/c/VLCC/$folder/TAS/
+				tar -czvf volte.tar.gz volte
+			fi
 			cd ..
-			cd /drives/c/VLCC/$folder/TAS/
-			tar -czvf volte.tar.gz volte
+			cd /drives/c/VLCC/$folder/
+			find . -name '*.gz' -execdir gunzip '{}' \;
+			find . -name '*.tar' -execdir tar -xvf '{}' \;
+			find . -name '*.pcap' -exec mv {} /cygdrive/c/VLCC/$folder/PCAP \;
+			cd ..
+			cd /drives/c/"Program Files"/Wireshark/
+			cmd /c mergecap -w c:/VLCC/$folder/PCAP/merged.pcap  c:/VLCC/$folder/PCAP/*.pcap
+			
+			cd ..
+			cd /drives/c/VLCC/$folder/PCAP/
+			tar -czvf merged.tar.gz merged.pcap
+			rm -rf *.pcap
+		else	
+			echo "################################################################################"
+			echo
+			echo
+			echo " 			MERGECAP is \e[1;31m DISABLED\e[0m		"
+			echo
+			echo
+			echo "################################################################################" 
 		fi
-		cd ..
-		cd /drives/c/VLCC/$folder/
-		find . -name '*.gz' -execdir gunzip '{}' \;
-		find . -name '*.tar' -execdir tar -xvf '{}' \;
-		find . -name '*.pcap' -exec mv {} /cygdrive/c/VLCC/$folder/PCAP \;
-		cd ..
-		cd /drives/c/"Program Files"/Wireshark/
-		cmd /c  mergecap -w c:/VLCC/$folder/PCAP/merged.pcap  c:/VLCC/$folder/PCAP/*.pcap
-		#echo "################################################################################"
-		echo
-		echo
-		#echo " 			MERGE IS DISABLED HERE		"	
-		echo
-		echo
-		#echo "################################################################################"
-        echo
-		
-		cd ..
-		cd /drives/c/VLCC/$folder/PCAP/
-		tar -czvf merged.tar.gz merged.pcap
-		rm -rf *.pcap
 
 		os_type=$(uname -s)
 		if [ "$os_type" == "Linux" ];then
@@ -708,12 +733,13 @@ Main()
 			explorer.exe "c:\VLCC\\$folder"
 		fi
 
-		
+	        rm -f status.txt	
+		find . -type d -print | xargs rmdir 2>/dev/null
 
 		echo "################################################################################"
 		echo
 		echo
-		echo " 			TRACE CAPTURE COMPLETE		"	
+		echo " 			TRACE CAPTURE \e[1;32m COMPLETED\e[0m		"	
 		echo
 		echo
 		echo "################################################################################"
@@ -736,9 +762,10 @@ mon=$(date +%b)
 pass=$1
 call_type=$2
 operation=$3
+
 echo
 echo
-pre_pwd=$(cat /cygdrive/c/VLCC/script/data | grep $mon | cut -d ":" -f 2)
+pre_pwd=$(cat script/data | grep $mon | cut -d ":" -f 2)
 
 data=`echo $pre_pwd | openssl enc -aes-128-cbc -a -d -salt -pass pass:test 2>/dev/null` 
 

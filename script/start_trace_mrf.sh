@@ -8,7 +8,7 @@ set arg5 [lindex $argv 4];
 
 spawn ssh  $arg2@$arg1
 expect "*assword*" { send "$arg3\n" }
-expect "*#*" {send "nohup tcpdump -i any -n -N -s 0 -vvv -x -w /var/tmp/trace.pcap  >normal.log 2>/dev/null &\n" }
+expect "*#*" {send "nohup tcpdump -G $arg4 -W 1 -i any -n -N -s 0 -vvv -x -w /var/tmp/${arg5}_mrf.pcap  >normal.log 2>/dev/null &\n" }
 send -- "exit\n"
 expect eof
 

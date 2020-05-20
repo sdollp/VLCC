@@ -14,7 +14,7 @@ sc_status=${11}
 
 if [[ "$cfed_status" == "$True" ]]; then
 	/usr/bin/expect <<EOD
-	spawn scp $user@$oam_ip:/storage/CFED/cfed25.tar.gz $path/$folder/SBC/CFED/
+	spawn scp $user@$oam_ip:/storage/CFED/cfed.tar.gz $path/$folder/SBC/CFED/
 	expect "*assword*" { send "$pwd\n" }
 	expect eof
 EOD
@@ -22,7 +22,7 @@ fi
 
 if [[ "$dfed_status" == "$True" ]]; then
 	/usr/bin/expect <<EOD
-	spawn scp $user@$oam_ip:/storage/DFED/dfed25.tar.gz $path/$folder/SBC/DFED/
+	spawn scp $user@$oam_ip:/storage/DFED/dfed.tar.gz $path/$folder/SBC/DFED/
 	expect "*assword*" { send "$pwd\n" }
 	expect eof
 EOD
@@ -46,7 +46,7 @@ fi
 
 if [[ "$fw_status" == "$True" ]]; then
 	/usr/bin/expect <<EOD
-	spawn scp $user@$oam_ip:/storage/FW/fw25.tar.gz $path/$folder/SBC/FW/
+	spawn scp $user@$oam_ip:/storage/FW/fw.tar.gz $path/$folder/SBC/FW/
 	expect "*assword*" { send "$pwd\n" }
 	expect eof
 EOD

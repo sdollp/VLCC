@@ -6,31 +6,25 @@ bgc_status=$3
 fw_status=$4
 master_status=$5
 sc_status=$6
-
+tc_name=$7
 
 if [[ "$cfed_status" == "$True" ]]; then
         mkdir CFED
-        cfed=$(lcp_status | grep -i 'CFED.*ENABLEDUNLOCKED' | awk '{print $5}')
-        if [ "$cfed" == "ENABLEDUNLOCKED" ]
-        then
-               cfed=$(lcp_status | grep -i 'CFED.*ENABLEDUNLOCKED' | awk '{print $6}')
-        fi
-        echo "$cfed" > vm_status
+        
+        cfed=$(cat vm_status | head -n 1)
+        #echo "$cfed" > vm_status
         ssh $cfed << EOF
         
         echo
         echo
         echo
         echo
-        processID=\$(ps -ef | grep -m1 "cfed25" | awk '{print \$2}')
+        processID=\$(ps -ef | grep -m1 $tc_name | awk '{print \$2}')
         echo
+        kill -2 \$processID
         echo
         
         echo
-		kill -2 \$processID
-		echo 
-		echo
-		sleep 2s
         kill -9 \$processID            
         echo
         echo
@@ -39,35 +33,27 @@ if [[ "$cfed_status" == "$True" ]]; then
         
 EOF
         echo "#########################COPYING CFED FILE#########################"
-        scp $cfed:/storage/cfed25.pcap /storage/CFED/
-        tar -czvf /storage/CFED/cfed25.tar.gz CFED/* --warning=no-file-changed
-        ssh $cfed "rm -rf /storage/cfed25.pcap"
+        scp $cfed:/storage/${tc_name}_cfed.pcap /storage/CFED/
+        tar -czvf /storage/CFED/cfed.tar.gz CFED/* --warning=no-file-changed
+        ssh $cfed "rm -rf /storage/${tc_name}_cfed.pcap"
 fi
 
 if [[ "$dfed_status" == "$True" ]]; then
         mkdir DFED
-        dfed=$(lcp_status | grep -i 'DFED.*ENABLEDUNLOCKED' | awk '{print $5}')
-        if [ "$dfed" == "ENABLEDUNLOCKED" ]
-        then
-               dfed=$(lcp_status | grep -i 'DFED.*ENABLEDUNLOCKED' | awk '{print $6}')
-        fi
-        echo "$dfed" > vm_status
-        dfed=$(cat vm_status | head -n 1)
+        
+        dfed=$(cat vm_status | head -n 2 | tail -n 1)
         ssh $dfed << EOF
         
         echo
         echo
         echo
         echo
-        processID=\$(ps -ef | grep -m1 "dfed25" | awk '{print \$2}')
+        processID=\$(ps -ef | grep -m1 $tc_name | awk '{print \$2}')
+        echo
+        kill -2 \$processID
         echo
         echo
         echo
-        echo
-		kill -2 \$processID
-		echo 
-		echo
-		sleep 2s
         kill -9 \$processID       
         echo
         echo
@@ -75,36 +61,28 @@ if [[ "$dfed_status" == "$True" ]]; then
         sleep 5s
 EOF
         echo "#########################COPYING DFED FILE#########################"
-        scp $dfed:/storage/dfed25.pcap /storage/DFED/
-        tar -czvf /storage/DFED/dfed25.tar.gz DFED/* --warning=no-file-changed
-        ssh $dfed "rm -rf /storage/dfed25.pcap"
+        scp $dfed:/storage/${tc_name}_dfed.pcap /storage/DFED/
+        tar -czvf /storage/DFED/dfed.tar.gz DFED/* --warning=no-file-changed
+        ssh $dfed "rm -rf /storage/${tc_name}_dfed.pcap"
 
 fi
 
 if [[ "$fw_status" == "$True" ]]; then
         mkdir FW
-        fw=$(lcp_status | grep -i 'FEPH.*ENABLEDUNLOCKED' | awk '{print $5}')
-        if [ "$fw" == "ENABLEDUNLOCKED" ]
-        then
-               fw=$(lcp_status | grep -i 'FEPH.*ENABLEDUNLOCKED' | awk '{print $6}')
-        fi
-        echo "$fw" > vm_status
-        fw=$(cat vm_status | head -n 1)
+       
+        fw=$(cat vm_status | head -n 3 | tail -n 1)
         ssh $fw << EOF
         
         echo
         echo
         echo
         echo
-        processID=\$(ps -ef | grep -m1 "fw25" | awk '{print \$2}')
+        processID=\$(ps -ef | grep -m1 $tc_name | awk '{print \$2}')
         echo
         echo
+        kill -2 \$processID
         echo
         echo
-		kill -2 \$processID
-		echo 
-		echo
-		sleep 2s
         kill -9 \$processID      
         echo
         echo
@@ -112,9 +90,9 @@ if [[ "$fw_status" == "$True" ]]; then
         sleep 5s
 EOF
         echo "#########################COPYING FW FILE#########################"
-        scp $fw:/storage/fw25.pcap /storage/FW/
-        tar -czvf /storage/FW/fw25.tar.gz FW/* --warning=no-file-changed
-        ssh $fw "rm -rf /storage/fw25.pcap"
+        scp $fw:/storage/${tc_name}_fw.pcap /storage/FW/
+        tar -czvf /storage/FW/fw.tar.gz FW/* --warning=no-file-changed
+        ssh $fw "rm -rf /storage/${tc_name}_fw.pcap"
 fi
 
 if [[ "$bgc_status" == "$True" ]]; then
@@ -129,12 +107,9 @@ if [[ "$bgc_status" == "$True" ]]; then
                 processID=\$(ps -ef | grep -m1 $line | awk '{print \$2}')
                 echo
                 echo
+                kill -2 \$processID
                 echo
                 echo
-				kill -2 \$processID
-				echo 
-				echo
-				sleep 2s
                 kill -9 \$processID
         	    # killall -9 tcpdump
                 echo
@@ -149,14 +124,14 @@ echo
 echo "#########################COPYING BGC FILE#########################"
 cat bgc_status | while read line
 do
-        scp $line:/storage/bgw${line}.pcap /storage/BGC/
+        scp $line:/storage/${tc_name}_bgw_${line}.pcap /storage/BGC/
 
 done
 tar -czvf /storage/BGC/BGC.tar.gz BGC/* --warning=no-file-changed
 
 cat bgc_status | while read line
 do
-        ssh $line "rm -rf /storage/bgw${line}.pcap"
+        ssh $line "rm -rf /storage/${tc_name}_bgw_${line}.pcap"
 
 
 done
@@ -172,15 +147,12 @@ if [[ "$sc_status" == "$True" ]]; then
                 echo
                 echo
                 echo
-                processID=\$(ps -ef | grep -m1 $line | awk '{print \$2}')
+                processID=\$(ps -ef | grep -m1 $tc_name | awk '{print \$2}')
                 echo
                 echo
+                kill -2 \$processID
                 echo
                 echo
-				kill -2 \$processID
-				echo 
-				echo
-				sleep 2s
                 kill -9 \$processID
                 # killall -9 tcpdump
                 echo
@@ -195,14 +167,14 @@ echo
 echo "#########################COPYING SC FILE#########################"
 cat sc_status | while read line
 do
-        scp $line:/storage/sc${line}.pcap /storage/SC/
+        scp $line:/storage/${tc_name}_sc_${line}.pcap /storage/SC/
 
 done
 tar -czvf /storage/SC/SC.tar.gz SC/* --warning=no-file-changed
 
 cat sc_status | while read line
 do
-        ssh $line "rm -rf /storage/sc${line}.pcap"
+        ssh $line "rm -rf /storage/${tc_name}_sc_${line}.pcap"
 
 
 done

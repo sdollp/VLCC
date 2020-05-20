@@ -1,5 +1,4 @@
 #!/bin/bash
-True="T"
 cif_ip=$1
 user=$2
 pwd=$3

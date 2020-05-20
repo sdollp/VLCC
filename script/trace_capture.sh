@@ -5,6 +5,8 @@ dfed_status=$2
 bgc_status=$3
 fw_status=$4
 sc_status=$5
+timer=$6
+tc_name=$7
 if [[ "$cfed_status" == "$True" ]]; then
         cfed=$(lcp_status | grep -i 'CFED.*ENABLEDUNLOCKED' | awk '{print $5}')
 
@@ -20,7 +22,7 @@ if [[ "$cfed_status" == "$True" ]]; then
         echo
         echo
         
-        nohup tcpdump -i any -s 0 -w /storage/cfed25.pcap >normal.log 2>/dev/null &
+        nohup tcpdump -G $timer -W 1 -i any -s 0 -w /storage/${tc_name}_cfed.pcap >normal.log 2>/dev/null &
         echo
         echo
         echo
@@ -36,14 +38,14 @@ if [[ "$dfed_status" == "$True" ]]; then
         then
 	       dfed=$(lcp_status | grep -i 'DFED.*ENABLEDUNLOCKED' | awk '{print $6}')
         fi
-        echo "$dfed" > vm_status
+        echo "$dfed" >> vm_status
         ssh $dfed << EOF
         
         echo
         echo
         echo
         echo
-        nohup tcpdump -i any -s 0 -w /storage/dfed25.pcap >normal.log 2>/dev/null &
+        nohup tcpdump -G $timer -W 1 -i any -s 0 -w /storage/${tc_name}_dfed.pcap >normal.log 2>/dev/null &
         echo
         echo
         echo
@@ -58,7 +60,7 @@ if [[ "$fw_status" == "$True" ]]; then
         then
 	       fw=$(lcp_status | grep -i 'FEPH.*ENABLEDUNLOCKED' | awk '{print $6}')
         fi
-        echo "$fw" > vm_status
+        echo "$fw" >> vm_status
         ssh $fw << EOF
 
 
@@ -66,7 +68,7 @@ if [[ "$fw_status" == "$True" ]]; then
         echo
         echo
         echo
-        nohup tcpdump -i any -s 0 -w /storage/fw25.pcap >normal.log 2>/dev/null &
+        nohup tcpdump -G $timer -W 1 -i any -s 0 -w /storage/${tc_name}_fw.pcap >normal.log 2>/dev/null &
         echo
         echo
         echo
@@ -95,7 +97,7 @@ do
                 echo
                 echo
                 echo
-                nohup tcpdump -i any -s 0 -w /storage/bgw${line}.pcap >normal.log 2>/dev/null &
+                nohup tcpdump -G $timer -W 1 -i any -s 0 -w /storage/${tc_name}_bgw_${line}.pcap >normal.log 2>/dev/null &
                 echo
                 echo
                 echo
@@ -129,7 +131,7 @@ do
                 echo
                 echo
                 echo
-                nohup tcpdump -i any -s 0 -w /storage/sc${line}.pcap >normal.log 2>/dev/null &
+                nohup tcpdump -G $timer -W 1 -i any -s 0 -w /storage/${tc_name}_sc_${line}.pcap >normal.log 2>/dev/null &
                 echo
                 echo
                 echo

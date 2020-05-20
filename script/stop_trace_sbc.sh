@@ -9,6 +9,7 @@ set arg6 [lindex $argv 5];
 set arg7 [lindex $argv 6];
 set arg8 [lindex $argv 7];
 set arg9 [lindex $argv 8];
+set arg10 [lindex $argv 9];
 
 spawn ssh  $arg2@$arg1
 expect "*assword*" { send "$arg3\n" }
@@ -16,7 +17,7 @@ expect "*day*" {send "\n"}
 expect "*vi):*" {send "\n"}
 expect "*#*" { send "cd /storage\n" }
 expect "*#*" {send "chmod 755 trace_stop.sh\n" }
-expect "*#*" {send  "./trace_stop.sh $arg4 $arg5 $arg6 $arg7 $arg8 $arg9\n "}
+expect "*#*" {send  "./trace_stop.sh $arg4 $arg5 $arg6 $arg7 $arg8 $arg9 $arg10\n "}
 send -- "exit\n"
 expect eof
 
