@@ -265,6 +265,7 @@ stop_trace_cfx()
 	tdcore_status=$6
 	multi_ip=$7
 	tc_name=$8
+	folder_path=${path}/${folder}
 	cd $folder
 	mkdir CFX
 	#cd CFX
@@ -289,12 +290,12 @@ stop_trace_cfx()
 		echo "$tc_name"
 		proc_id=$(grep $tc_name process_id | awk '{print $2}')
 		echo "$proc_id"
-		./stop_trace_cfx_acif.sh $cif_ip $user $pwd $cif_act $proc_id $tc_name
+		./stop_trace_cfx_acif.sh $cif_ip $user $pwd $cif_act $proc_id $tc_name $folder_path
 		ltd=$(cat ltd)
 		./get_process_id.sh  $cif_ip $user $pwd $ltd_act
 		chmod 755 process_id
 		proc_id=$(grep $tc_name process_id | awk '{print $2}')
-		./stop_trace_cfx_l2td.sh $cif_ip $user $pwd $ltd $proc_id $tc_name
+		./stop_trace_cfx_l2td.sh $cif_ip $user $pwd $ltd $proc_id $tc_name $folder_path
 		cd ..
 		cd $folder
 		
@@ -311,14 +312,14 @@ stop_trace_cfx()
 		./get_process_id.sh  $cif_ip $user $pwd $cif_act
 		chmod 755 process_id
 		proc_id=$(grep $tc_name process_id | awk '{print $2}')
-		./stop_trace_cfx_acif.sh $cif_ip $user $pwd $cif_act $proc_id $tc_name
+		./stop_trace_cfx_acif.sh $cif_ip $user $pwd $cif_act $proc_id $tc_name $folder_path
 		cat tdcore | while read line
 		do 
 		echo
 		./get_process_id.sh  $cif_ip $user $pwd $line
 		chmod 755 process_id
 		proc_id=$(grep $tc_name process_id | awk '{print $2}')
-		./stop_trace_cfx_tdcore.sh $cif_ip $user $pwd $line $proc_id $tc_name
+		./stop_trace_cfx_tdcore.sh $cif_ip $user $pwd $line $proc_id $tc_name $folder_path
 		echo
 		echo
 		done
@@ -723,6 +724,19 @@ Main()
 			echo
 			echo "################################################################################" 
 		fi
+		cd /drives/c/VLCC/$folder
+		sed -n '/@!@/,/@!@/p'  sbc_trace_details > ONGOING_TRACES.txt
+	        sed -n '/@!@/,/@!@/p' mrf_trace_details >> ONGOING_TRACES.txt
+		sed -n '/@!@/,/exit/p'  cif_trace_details >> ONGOING_TRACES.txt
+		sed -i 's/@!@//g' ONGOING_TRACES.txt
+
+
+		rm -f  sbc_trace_details mrf_trace_details cif_trace_details
+
+		cd /drives/c/VLCC
+
+		rm -f status.txt	
+		find . -type d -print | xargs rmdir 2>/dev/null
 
 		os_type=$(uname -s)
 		if [ "$os_type" == "Linux" ];then
@@ -733,13 +747,12 @@ Main()
 			explorer.exe "c:\VLCC\\$folder"
 		fi
 
-	        rm -f status.txt	
-		find . -type d -print | xargs rmdir 2>/dev/null
+	     
 
 		echo "################################################################################"
 		echo
 		echo
-		echo " 			TRACE CAPTURE \e[1;32m COMPLETED\e[0m		"	
+		echo " 			TRACE CAPTURE COMPLETED		"	
 		echo
 		echo
 		echo "################################################################################"

@@ -70,3 +70,21 @@ expect "*#*" {send "rm -rf CFED DFED FW MASTER BGC SC\n"}
 send -- "exit\n"
 expect eof
 EOD
+
+/usr/bin/expect <<EOD
+	spawn scp $user@$oam_ip:/storage/sbc_trace_details $path/$folder/
+	expect "*assword*" { send "$pwd\n" }
+	expect eof
+EOD
+
+/usr/bin/expect <<EOD
+spawn ssh  $user@$oam_ip
+expect "*assword*" { send "$pwd\n" }
+expect "*day*" {send "\n"}
+expect "*vi):*" {send "\n"}
+expect "*#*" { send "su - lss\n"}
+expect "*day*" {send "\n"}
+expect "*vi):*" {send "\n"}
+expect "*#*" { send "log_cli -t loglevel -v 3 -f active_only -t feph -p all -i all\n"}
+send -- "exit\n"
+EOD

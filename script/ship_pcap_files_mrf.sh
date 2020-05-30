@@ -17,3 +17,7 @@ expect "*assword*" { send "$arg3\n" }
 expect "*#*" { send "rm -f /var/tmp/${arg6}_mrf.pcap /var/tmp/MRF.tar.gz\n" }
 send -- "exit\n"
 expect eof
+
+spawn scp $arg2@$arg1:/root/mrf_trace_details $arg4/$arg5/
+expect "*assword*" { send "$arg3\n" }
+expect eof

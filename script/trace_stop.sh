@@ -8,12 +8,16 @@ master_status=$5
 sc_status=$6
 tc_name=$7
 
+touch /storage/sbc_trace_details
+
+> /storage/sbc_trace_details
+
 if [[ "$cfed_status" == "$True" ]]; then
         mkdir CFED
         
         cfed=$(cat vm_status | head -n 1)
         #echo "$cfed" > vm_status
-        ssh $cfed << EOF
+        ssh $cfed >> /storage/sbc_trace_details << EOF
         
         echo
         echo
@@ -25,10 +29,18 @@ if [[ "$cfed_status" == "$True" ]]; then
         echo
         
         echo
-        kill -9 \$processID            
+        kill -9 \$processID         
+	   echo
+	   sleep 2s
         echo
+        echo "@!@"
         echo
+        echo "############################   !SBC-CFED! #######################################"
+        ps -ef | grep tcpdump
         echo
+        echo "@!@"
+        echo
+
         sleep 5s
         
 EOF
@@ -38,11 +50,14 @@ EOF
         ssh $cfed "rm -rf /storage/${tc_name}_cfed.pcap"
 fi
 
+
+
+
 if [[ "$dfed_status" == "$True" ]]; then
         mkdir DFED
         
         dfed=$(cat vm_status | head -n 2 | tail -n 1)
-        ssh $dfed << EOF
+        ssh $dfed >> /storage/sbc_trace_details << EOF
         
         echo
         echo
@@ -56,8 +71,15 @@ if [[ "$dfed_status" == "$True" ]]; then
         echo
         kill -9 \$processID       
         echo
+	    echo
+	    sleep 2s
         echo
+        echo "@!@"
         echo
+        echo "############################   !SBC-DFED! #######################################"
+        ps -ef | grep tcpdump
+        echo
+        echo "@!@"
         sleep 5s
 EOF
         echo "#########################COPYING DFED FILE#########################"
@@ -71,7 +93,7 @@ if [[ "$fw_status" == "$True" ]]; then
         mkdir FW
        
         fw=$(cat vm_status | head -n 3 | tail -n 1)
-        ssh $fw << EOF
+        ssh $fw >> /storage/sbc_trace_details << EOF
         
         echo
         echo
@@ -85,9 +107,17 @@ if [[ "$fw_status" == "$True" ]]; then
         echo
         kill -9 \$processID      
         echo
+	    echo
+	    sleep 5s
         echo
+        echo "@!@"
         echo
-        sleep 5s
+        echo "############################   !SBC-FW! #######################################"
+        ps -ef | grep tcpdump
+        echo
+        echo "@!@"
+        echo
+       
 EOF
         echo "#########################COPYING FW FILE#########################"
         scp $fw:/storage/${tc_name}_fw.pcap /storage/FW/
@@ -99,7 +129,7 @@ if [[ "$bgc_status" == "$True" ]]; then
        mkdir BGC
         cat bgc_status | while read line
         do
-        ssh $line << EOF
+        ssh $line >> /storage/sbc_trace_details << EOF
                 echo
                 echo
                 echo
@@ -113,9 +143,18 @@ if [[ "$bgc_status" == "$True" ]]; then
                 kill -9 \$processID
         	    # killall -9 tcpdump
                 echo
+		        echo
+		        sleep 5s
+                echo
+                echo "@!@"
+                echo
+                echo "############################   !SBC-BGC! #######################################"
+                ps -ef | grep tcpdump
                 echo
                 echo
-                sleep 5s
+                echo "@!@"
+                echo
+               
 EOF
 done
 
@@ -157,8 +196,17 @@ if [[ "$sc_status" == "$True" ]]; then
                 # killall -9 tcpdump
                 echo
                 echo
+	           	echo
                 echo
                 sleep 5s
+                echo "@!@"
+		        echo
+		        echo "############################   !SBC-SC! #######################################"
+		        ps -ef | grep tcpdump
+		        echo
+                echo "@!@"
+
+
 EOF
 done
 

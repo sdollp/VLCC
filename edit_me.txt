@@ -53,6 +53,8 @@ TAS_COMMAND=volte
 GETSUBSDATA_TAS=T
 TAS_IMPU 6590248664
 TAS_IMPU 6590248743
+TAS_IMPU 6590248616
+TAS_IMPU 659024858
 
 ------------------------------------------------------------------------
 							MRF
